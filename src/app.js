@@ -1,5 +1,5 @@
-import { getData } from "./src/util/fetch.js";
-import { Item } from "./src/components/Item.js";
+// import { getData } from "./util/fetch.js";
+import { Item } from "./components/Item.js";
 function app() {
     //쓰로틀 적용 예정
     document.querySelector("#btn_like").onclick = () => {
