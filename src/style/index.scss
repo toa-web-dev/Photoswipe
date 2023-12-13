@@ -1,7 +1,8 @@
 @import "./reset.css";
 @import "./card.scss";
+@import "./button.scss";
 
-main{
+main {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,14 +19,14 @@ main{
 }
 #button_container {
     margin-top: 1rem;
-    button{
+    button {
         background-color: transparent;
         border: none;
         font-size: 2rem;
-        &:first-of-type{
+        &:first-of-type {
             color: red;
         }
-        &:last-of-type{
+        &:last-of-type {
             color: green;
         }
     }

@@ -24,16 +24,12 @@
     z-index: 10;
 }
 @keyframes swipeRight {
-    from {
-    }
     to {
         transform: translateX(200px);
     }
 }
 
 @keyframes swipeLeft {
-    from {
-    }
     to {
         transform: translateX(-200px);
     }
