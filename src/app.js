@@ -6,19 +6,15 @@ function app() {
     const btnDislike = document.querySelector('[data-btn-preference="dislike"]');
     btnLike.classList.add("active");
     btnDislike.classList.add("active");
-    const toggleStyle = () => {
-        btnLike.classList.toggle("active");
-        btnDislike.classList.toggle("active");
-        btnLike.classList.toggle("deactive");
-        btnDislike.classList.toggle("deactive");
-    };
     const thorttle = (func) => {
         if (!timer) {
             func();
-            toggleStyle();
+            btnLike.classList.replace("active", "deactive");
+            btnDislike.classList.replace("active", "deactive");
             timer = setTimeout(() => {
                 timer = null;
-                toggleStyle();
+                btnLike.classList.replace("deactive", "active");
+                btnDislike.classList.replace("deactive", "active");
             }, 500);
         }
     };
