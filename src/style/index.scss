@@ -20,14 +20,7 @@ main {
 #button_container {
     margin-top: 1rem;
     button {
-        background-color: transparent;
         border: none;
         font-size: 2rem;
-        &:first-of-type {
-            color: red;
-        }
-        &:last-of-type {
-            color: green;
-        }
     }
 }

@@ -1,5 +1,16 @@
-.deactive{
-  opacity: 0.5;
-  color: gainsboro;
-  cursor:not-allowed
+.active {
+    opacity: 1;
+    cursor: pointer;
+    &[data-btn-preference="like"] {
+        color: green;
+    }
+    &[data-btn-preference="dislike"] {
+        color: red;
+    }
+}
+
+.deactive {
+    opacity: 0.5;
+    color: white;
+    background-color: gray;
 }

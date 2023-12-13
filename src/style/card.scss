@@ -15,11 +15,11 @@
     border-radius: 1rem;
     transition: transform 1s;
 }
-.like {
+.action_like {
     animation: swipeRight 1s;
     z-index: 10;
 }
-.dislike {
+.action_dislike {
     animation: swipeLeft 1s;
     z-index: 10;
 }

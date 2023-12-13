@@ -1,20 +1,24 @@
 // import { getData } from "./util/fetch.js";
 import { Item } from "./components/Item.js";
 function app() {
-    //쓰로틀 적용 예정
-    //쓰로틀로 이벤트 대기중일때는 버튼이 비활성화된 스타일을 보여줘야 UX 향상함
     let timer = null;
     const btnLike = document.querySelector('[data-btn-preference="like"]');
     const btnDislike = document.querySelector('[data-btn-preference="dislike"]');
+    btnLike.classList.add("active");
+    btnDislike.classList.add("active");
+    const toggleStyle = () => {
+        btnLike.classList.toggle("active");
+        btnDislike.classList.toggle("active");
+        btnLike.classList.toggle("deactive");
+        btnDislike.classList.toggle("deactive");
+    };
     const thorttle = (func) => {
         if (!timer) {
             func();
-            btnLike.classList.add("deactive");
-            btnDislike.classList.add("deactive");
+            toggleStyle();
             timer = setTimeout(() => {
                 timer = null;
-                btnLike.classList.remove("deactive");
-                btnDislike.classList.remove("deactive");
+                toggleStyle();
             }, 500);
         }
     };
@@ -34,8 +38,6 @@ function app() {
         current.classList.add(`action_${preference}`);
         const prev = current;
         const next = current.previousElementSibling;
-        // if (nextCard) initEventCard(nextCard);
-        // nextCard가 없으면 다음 데이터를 fetch해서 카드를 생성해야함; 다음이 아니라 다다음 카드가 없을때부태 fetch해서 로딩을 줄일 수 있음
         current = next;
         $cardContainer.insertBefore(Item({ id: 10 }), $cardContainer.children[0]);
 
