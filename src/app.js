@@ -4,23 +4,25 @@ function app() {
     //쓰로틀 적용 예정
     //쓰로틀로 이벤트 대기중일때는 버튼이 비활성화된 스타일을 보여줘야 UX 향상함
     let timer = null;
-    const btnLike = document.querySelector("#btn_like");
-    const btnDislike = document.querySelector("#btn_dislike");
-    const thorttle = (func, el) => {
+    const btnLike = document.querySelector('[data-btn-preference="like"]');
+    const btnDislike = document.querySelector('[data-btn-preference="dislike"]');
+    const thorttle = (func) => {
         if (!timer) {
             func();
-            el.classList.add("deactive");
+            btnLike.classList.add("deactive");
+            btnDislike.classList.add("deactive");
             timer = setTimeout(() => {
                 timer = null;
-                el.classList.remove("deactive");
+                btnLike.classList.remove("deactive");
+                btnDislike.classList.remove("deactive");
             }, 500);
         }
     };
-    btnLike.onclick = () => {
-        thorttle(() => swipe("like"), btnLike);
+    btnLike.onclick = (e) => {
+        thorttle(() => swipe(e.target.dataset.btnPreference));
     };
-    btnDislike.onclick = () => {
-        thorttle(() => swipe("dislike"), btnDislike);
+    btnDislike.onclick = (e) => {
+        thorttle(() => swipe(e.target.dataset.btnPreference));
     };
 
     let $cardContainer = document.querySelector("#card_container");
@@ -29,7 +31,7 @@ function app() {
 
     current = $cardContainer.querySelector(".card:last-child");
     const swipe = (preference) => {
-        current.classList.add(preference);
+        current.classList.add(`action_${preference}`);
         const prev = current;
         const next = current.previousElementSibling;
         // if (nextCard) initEventCard(nextCard);
