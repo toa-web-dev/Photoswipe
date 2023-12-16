@@ -1,6 +1,24 @@
-export async function getData(seed) {
-    const data = await fetch(`https://picsum.photos/100/150?random=${seed}`);
-    return;
+const URL = import.meta.env.VITE_URL;
+
+/**
+ * @async
+ * @param {Array<number>} cardIdArr
+ * @returns {Promise<object>} {id:number,url:string}
+ */
+export async function getCardData(cardIdArr) {
+    const result = await Promise.all(
+        cardIdArr.map(async (el) => {
+            const response = await fetch(URL + `?random=${el}`);
+            let data = null;
+            try {
+                data = await response.json();
+            } catch (error) {
+                data = response;
+            }
+            return { id: el , url: data.url};
+        })
+    );
+    return result;
 }
 
 // fetch 기능
