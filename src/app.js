@@ -3,7 +3,7 @@ import { Item } from "./components/Item.js";
 function app() {
     let $cardContainer = document.querySelector("#card_container");
     let $currentCard;
-    let timer = null;
+    let throttleTimer = null;
     let cardIdArr = [0, 1, 2, 3, 4];
     let currentCardDataArr = [],
         nextCardDataArr = [];
@@ -16,12 +16,12 @@ function app() {
         $btnDislike.classList.add("active");
 
         const btnThorttle = (func) => {
-            if (!timer) {
+            if (!throttleTimer) {
                 func();
                 $btnLike.classList.replace("active", "deactive");
                 $btnDislike.classList.replace("active", "deactive");
-                timer = setTimeout(() => {
-                    timer = null;
+                throttleTimer = setTimeout(() => {
+                    throttleTimer = null;
                     $btnLike.classList.replace("deactive", "active");
                     $btnDislike.classList.replace("deactive", "active");
                 }, 500);
