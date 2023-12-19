@@ -1,8 +1,4 @@
-#card_container {
-    position: relative;
-    width: 200px;
-    height: 300px;
-}
+$card-animation-time: 0.5s;
 
 .card {
     position: absolute;
@@ -13,7 +9,18 @@
     background-color: snow;
     border: 2px solid black;
     border-radius: 1rem;
-    transition: transform 1s;
+    transition-property: rotate;
+    transition-duration: $card-animation-time;
+    overflow: hidden;
+    &:nth-last-of-type(2){
+        rotate: -10deg;
+    }
+    &:nth-last-of-type(3){
+        rotate: -20deg;
+    }
+    &:nth-last-of-type(n+4){
+        rotate: -22deg
+    }
     figcaption {
         text-align: center;
         font-size: 2rem;
@@ -21,11 +28,11 @@
     }
 }
 .action_like {
-    animation: swipeRight 1s;
+    animation: swipeRight $card-animation-time;
     z-index: 10;
 }
 .action_dislike {
-    animation: swipeLeft 1s;
+    animation: swipeLeft $card-animation-time;
     z-index: 10;
 }
 @keyframes swipeRight {

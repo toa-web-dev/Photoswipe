@@ -4,7 +4,8 @@ import { Item } from "./components/Item.js";
 const RENDER_CARD_NUM = 5;
 
 function app() {
-    let $cardContainer = document.querySelector("#card_container");
+    const $removalContainer = document.querySelector("#removal_container");
+    const $cardContainer = document.querySelector("#card_container");
     let $currentCard;
     let cardIdArr = Array.from({ length: RENDER_CARD_NUM }).map((_, index) => index);
     let targetArr = [];
@@ -65,8 +66,9 @@ function app() {
             $currentCard.classList.add(`action_${preference}`);
             const $prevCard = $currentCard;
             $currentCard = $currentCard.previousElementSibling;
+            $removalContainer.appendChild($prevCard);
             const RemoveSwipedCard = () => {
-                $cardContainer.removeChild($prevCard);
+                $removalContainer.removeChild($prevCard);
                 $prevCard.removeEventListener("animationend", RemoveSwipedCard);
             };
             $prevCard.addEventListener("animationend", RemoveSwipedCard);
