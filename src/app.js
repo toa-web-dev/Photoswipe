@@ -37,7 +37,6 @@ function app() {
             }
         };
     };
-
     const InitData = async () => {
         targetArr = await getCardDataFromId(cardIdArr); //[0,1,2,3,4]
         for (let i = targetArr.length - 1; i >= 0; i--) {
@@ -48,28 +47,26 @@ function app() {
         bufferArr = await getCardDataFromId(cardIdArr);
     };
     const InsertCard = async () => {
-        let curCardId = parseInt($currentCard.id);
-        if (curCardId === targetArr.at(-1).id) {
-            console.log(curCardId, targetArr.at(-1).id);
-            console.log("last target card");
-            targetArr = bufferArr;
-            cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
-            bufferArr = await getCardDataFromId(cardIdArr);
-            console.log(targetArr, "|", bufferArr);
-            console.log(curCardId, targetArr.at(-1).id);
-            console.log(targetArr, bufferArr);
-            $cardContainer.insertBefore(
-                Item(targetArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
-                $cardContainer.firstElementChild
-            );
-        } else {
-            $cardContainer.insertBefore(
-                Item(bufferArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
-                $cardContainer.firstElementChild
-            );
+        try {
+            let curCardId = parseInt($currentCard.id);
+            if (curCardId === targetArr.at(-1).id) {
+                targetArr = bufferArr;
+                cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
+                bufferArr = await getCardDataFromId(cardIdArr);
+                $cardContainer.insertBefore(
+                    Item(targetArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
+                    $cardContainer.firstElementChild
+                );
+            } else {
+                $cardContainer.insertBefore(
+                    Item(bufferArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
+                    $cardContainer.firstElementChild
+                );
+            }
+        } catch (e) {
+            console.log("카드 추가 중 오류 발생", e);
         }
     };
-
     const RemoveCard = (preference) => {
         try {
             $currentCard.classList.add(`action_${preference}`);
@@ -81,15 +78,13 @@ function app() {
             };
             $prevCard.addEventListener("animationend", RemoveSwipedCard);
         } catch (e) {
-            console.log(e);
+            console.log("카드 추가 중 오류 발생", e);
         }
     };
-
     const Swipe = (preference) => {
         InsertCard();
         RemoveCard(preference);
     };
-
     InitBtn();
     InitData();
 }
