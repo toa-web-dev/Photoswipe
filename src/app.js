@@ -1,7 +1,7 @@
 import { getCardDataFromId } from "./util/fetch.js";
 import { Item } from "./components/Item.js";
 
-const RENDER_CARD_NUM = 3;
+const RENDER_CARD_NUM = 5;
 
 function app() {
     let $cardContainer = document.querySelector("#card_container");
@@ -49,19 +49,12 @@ function app() {
     const InsertCard = async () => {
         try {
             let curCardId = parseInt($currentCard.id);
+            const renderItem = bufferArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0];
+            $cardContainer.insertBefore(Item(renderItem), $cardContainer.firstElementChild);
             if (curCardId === targetArr.at(-1).id) {
                 targetArr = bufferArr;
                 cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
                 bufferArr = await getCardDataFromId(cardIdArr);
-                $cardContainer.insertBefore(
-                    Item(targetArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
-                    $cardContainer.firstElementChild
-                );
-            } else {
-                $cardContainer.insertBefore(
-                    Item(bufferArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
-                    $cardContainer.firstElementChild
-                );
             }
         } catch (e) {
             console.log("카드 추가 중 오류 발생", e);
