@@ -1,10 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Photo swipe</title>
-  </head>
-  <body>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="./src/style/reset.css" />
+        <link rel="stylesheet" href="./src/style/index.scss" />
+        <title>Photo swipe</title>
+    </head>
+    <body>
+        <main>
+            <div id="frame">
+                <div id="card_container"></div>
+                <div id="button_container">
+                    <button data-btn-preference="dislike">X</button>
+                    <button data-btn-preference="like">O</button>
+                </div>
+            </div>
+        </main>
+        <script defer type="module" src="./src/app.js"></script>
+    </body>
 </html>
