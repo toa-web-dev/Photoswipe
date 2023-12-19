@@ -1,5 +1,6 @@
 export function Item(_data) {
     const $figure = document.createElement("figure");
+    $figure.id = _data.id;
     $figure.classList.add("card");
     $figure.style.backgroundImage = `url(${_data.url})`;
     const $figcap = document.createElement("figcaption");

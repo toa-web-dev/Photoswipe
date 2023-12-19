@@ -1,21 +1,30 @@
-import { getCardData } from "./util/fetch.js";
+import { getCardDataFromId } from "./util/fetch.js";
 import { Item } from "./components/Item.js";
+
+const RENDER_CARD_NUM = 3;
+
 function app() {
     let $cardContainer = document.querySelector("#card_container");
     let $currentCard;
-    let throttleTimer = null;
-    let cardIdArr = [0, 1, 2, 3, 4];
-    let currentCardDataArr = [],
-        nextCardDataArr = [];
-    let cardIdIndex = 0;
+    let cardIdArr = Array.from({ length: RENDER_CARD_NUM }).map((_, index) => index);
+    let targetArr = [];
+    let bufferArr = [];
 
     const InitBtn = () => {
+        let throttleTimer = null;
         const $btnLike = document.querySelector('[data-btn-preference="like"]');
         const $btnDislike = document.querySelector('[data-btn-preference="dislike"]');
         $btnLike.classList.add("active");
         $btnDislike.classList.add("active");
-
-        const btnThorttle = (func) => {
+        $btnLike.onclick = (e) => {
+            const preference = e.target.dataset.btnPreference;
+            thorttle(() => Swipe(preference));
+        };
+        $btnDislike.onclick = (e) => {
+            const preference = e.target.dataset.btnPreference;
+            thorttle(() => Swipe(preference));
+        };
+        const thorttle = (func) => {
             if (!throttleTimer) {
                 func();
                 $btnLike.classList.replace("active", "deactive");
@@ -27,59 +36,58 @@ function app() {
                 }, 500);
             }
         };
-
-        $btnLike.onclick = (e) => {
-            btnThorttle(() => Swipe(e.target.dataset.btnPreference));
-        };
-        $btnDislike.onclick = (e) => {
-            btnThorttle(() => Swipe(e.target.dataset.btnPreference));
-        };
     };
 
     const InitData = async () => {
-        currentCardDataArr = await getCardData(cardIdArr); //[0,1,2,3,4]
-        for (let i = cardIdArr.length - 1; i >= 0; i--) {
-            console.log(currentCardDataArr[i]);
-            $cardContainer.appendChild(Item(currentCardDataArr[i]));
-            cardIdIndex++;
+        targetArr = await getCardDataFromId(cardIdArr); //[0,1,2,3,4]
+        for (let i = targetArr.length - 1; i >= 0; i--) {
+            $cardContainer.appendChild(Item(targetArr[i]));
         }
-        cardIdArr = cardIdArr.map((el) => el + 5);
-        nextCardDataArr = await getCardData(cardIdArr); //[5,6,7,8,9]
         $currentCard = $cardContainer.querySelector(".card:last-child");
+        cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
+        bufferArr = await getCardDataFromId(cardIdArr);
     };
-
-    const InsertCard = () => {
-        if (cardIdIndex >= 5) {
-            currentCardDataArr = nextCardDataArr;
-            //currentCardDataArr = [5,6,7,8,9]
-            cardIdArr = cardIdArr.map((el) => el + 5);
-            (async () => {
-                nextCardDataArr = await getCardData(cardIdArr);
-            })();
-            //nextCardDataArr = [10,11,12,13,14]
-            cardIdIndex = 0;
+    const InsertCard = async () => {
+        let curCardId = parseInt($currentCard.id);
+        if (curCardId === targetArr.at(-1).id) {
+            console.log(curCardId, targetArr.at(-1).id);
+            console.log("last target card");
+            targetArr = bufferArr;
+            cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
+            bufferArr = await getCardDataFromId(cardIdArr);
+            console.log(targetArr, "|", bufferArr);
+            console.log(curCardId, targetArr.at(-1).id);
+            console.log(targetArr, bufferArr);
+            $cardContainer.insertBefore(
+                Item(targetArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
+                $cardContainer.firstElementChild
+            );
+        } else {
+            $cardContainer.insertBefore(
+                Item(bufferArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0]),
+                $cardContainer.firstElementChild
+            );
         }
-        $cardContainer.insertBefore(Item(currentCardDataArr[cardIdIndex]), $cardContainer.firstElementChild);
-        cardIdIndex++;
     };
 
-    const Swipe = (preference) => {
+    const RemoveCard = (preference) => {
         try {
             $currentCard.classList.add(`action_${preference}`);
-            const $prev = $currentCard;
-            const $next = $currentCard.previousElementSibling;
-            $currentCard = $next;
-
+            const $prevCard = $currentCard;
+            $currentCard = $currentCard.previousElementSibling;
             const RemoveSwipedCard = () => {
-                $cardContainer.removeChild($prev);
-                $prev.removeEventListener("animationend", RemoveSwipedCard);
+                $cardContainer.removeChild($prevCard);
+                $prevCard.removeEventListener("animationend", RemoveSwipedCard);
             };
-            $prev.addEventListener("animationend", RemoveSwipedCard);
-
-            InsertCard();
+            $prevCard.addEventListener("animationend", RemoveSwipedCard);
         } catch (e) {
             console.log(e);
         }
+    };
+
+    const Swipe = (preference) => {
+        InsertCard();
+        RemoveCard(preference);
     };
 
     InitBtn();

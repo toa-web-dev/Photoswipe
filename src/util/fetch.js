@@ -5,7 +5,7 @@ const URL = import.meta.env.VITE_URL;
  * @param {Array<number>} cardIdArr
  * @returns {Promise<object>} {id:number,url:string}
  */
-export async function getCardData(cardIdArr) {
+export async function getCardDataFromId(cardIdArr) {
     const result = await Promise.all(
         cardIdArr.map(async (el) => {
             const response = await fetch(URL + `?random=${el}`);
