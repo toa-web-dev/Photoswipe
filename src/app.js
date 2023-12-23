@@ -43,6 +43,7 @@ function app() {
             $cardContainer.appendChild(Item(targetArr[i]));
         }
         $currentCard = $cardContainer.querySelector(".card:last-child");
+        InitPointerEvent();
         cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
         bufferArr = await getCardDataFromId(cardIdArr);
     };
@@ -80,5 +81,43 @@ function app() {
     };
     InitBtn();
     InitData();
+
+    const InitPointerEvent = () => {
+        $currentCard.addEventListener("pointerdown", PointDownAction);
+    };
+
+    const PointDownAction = () => {
+        $currentCard.addEventListener("pointermove", PointMoveAction);
+        $currentCard.addEventListener("pointerup", PointUpAction);
+        $currentCard.addEventListener("pointerleave", PointLeaveAction);
+    };
+
+    const PointMoveAction = (e) => {
+        console.log("pointer move");
+        const _x = parseInt(e.clientX);
+        const _y = parseInt(e.clientY);
+        $currentCard.style.position = "fixed";
+        $currentCard.style.transform = `translate(calc(-50% + ${_x}px),calc(-50% + ${_y}px)`;
+    };
+    const PointLeaveAction = () => {
+        console.log("pointer leave");
+        $currentCard.style.position = "absolute";
+        $currentCard.removeEventListener("pointermove", PointMoveAction);
+    };
+    const PointUpAction = () => {
+        console.log("pointer up");
+        $currentCard.style.position = "absolute";
+        $currentCard.style.transform = `translate(0)`;
+        $currentCard.removeEventListener("pointermove", PointMoveAction);
+    };
+
+    //카드가 넘어간 뒤 $currentCard에 다음 카드가 할당되었을 때 기존 이벤트리스너를 제거하고 새로 등록해야함
+
+    const removeAction = () => {
+        $currentCard.removeEventListener("pointerdown", PointDownAction);
+        $currentCard.removeEventListener("pointermove", PointMoveAction);
+        $currentCard.removeEventListener("pointerup", PointUpAction);
+        $currentCard.removeEventListener("pointerleave", PointLeaveAction);
+    };
 }
 app();
