@@ -82,42 +82,65 @@ function app() {
     InitBtn();
     InitData();
 
+    let startPoint = {};
     const InitPointerEvent = () => {
-        $currentCard.addEventListener("pointerdown", PointDownAction);
+        console.log("init pointer event");
+        $currentCard.addEventListener("pointerdown", PointDown);
+        $currentCard.removeEventListener("pointermove", PointMove);
+        $currentCard.removeEventListener("pointerup", PointUp);
+        $currentCard.removeEventListener("pointerleave", PointLeave);
     };
 
-    const PointDownAction = () => {
-        $currentCard.addEventListener("pointermove", PointMoveAction);
-        $currentCard.addEventListener("pointerup", PointUpAction);
-        $currentCard.addEventListener("pointerleave", PointLeaveAction);
+    const PointDown = (e) => {
+        console.log("pointer down");
+        startPoint = { x: parseInt(e.clientX), y: parseInt(e.clientY) };
+        $currentCard.addEventListener("pointermove", PointMove);
+        $currentCard.addEventListener("pointerup", PointUp);
+        $currentCard.addEventListener("pointerleave", PointLeave);
     };
 
-    const PointMoveAction = (e) => {
+    const PointMove = (e) => {
         console.log("pointer move");
-        const _x = parseInt(e.clientX);
-        const _y = parseInt(e.clientY);
-        $currentCard.style.position = "fixed";
-        $currentCard.style.transform = `translate(calc(-50% + ${_x}px),calc(-50% + ${_y}px)`;
+        const distance = {
+            x: parseInt(e.clientX) - startPoint.x,
+            y: parseInt(e.clientY) - startPoint.y,
+        };
+        //일차방정식의 기울기 slope
+        const slope = distance.y / distance.x ? distance.y / distance.x : 0;
+        console.log(`기울기는 ${distance.y} / ${distance.x}`, distance.y / distance.x);
+        console.log(`절편은 ${startPoint.y} - ${slope} * ${startPoint.x}`, startPoint.y - slope * startPoint.x);
+        const calcPosition = (x, y) => {
+            const equationIntercept = startPoint.y - slope * startPoint.x;
+            const result = {};
+            return result;
+        };
+        console.log(innerWidth);
+        $currentCard.style.transform = `translate(${distance.x}px, ${distance.y}px) rotate(${
+            (distance.x / innerWidth) * 30
+        }deg)`;
     };
-    const PointLeaveAction = () => {
+    const PointLeave = () => {
         console.log("pointer leave");
-        $currentCard.style.position = "absolute";
-        $currentCard.removeEventListener("pointermove", PointMoveAction);
+        // 스와이프 범위 미만에서 발동될 경우 원점으로 돌아감
+        $currentCard.style.transform = `translate(0,0)`;
+        // 스와이프 범위 이상일 경우 OX 처리 함수 실행
+        InitPointerEvent();
     };
-    const PointUpAction = () => {
+    const PointUp = () => {
         console.log("pointer up");
-        $currentCard.style.position = "absolute";
-        $currentCard.style.transform = `translate(0)`;
-        $currentCard.removeEventListener("pointermove", PointMoveAction);
+        // 스와이프 범위 미만에서 발동될 경우 원점으로 돌아감
+        $currentCard.style.transform = `translate(0,0)`;
+        // 스와이프 범위 이상일 경우 OX 처리 함수 실행
+        InitPointerEvent();
     };
 
     //카드가 넘어간 뒤 $currentCard에 다음 카드가 할당되었을 때 기존 이벤트리스너를 제거하고 새로 등록해야함
 
-    const removeAction = () => {
-        $currentCard.removeEventListener("pointerdown", PointDownAction);
-        $currentCard.removeEventListener("pointermove", PointMoveAction);
-        $currentCard.removeEventListener("pointerup", PointUpAction);
-        $currentCard.removeEventListener("pointerleave", PointLeaveAction);
+    const remove = () => {
+        $currentCard.removeEventListener("pointerdown", PointDown);
+        $currentCard.removeEventListener("pointermove", PointMove);
+        $currentCard.removeEventListener("pointerup", PointUp);
+        $currentCard.removeEventListener("pointerleave", PointLeave);
     };
 }
 app();
