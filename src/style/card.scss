@@ -20,22 +20,3 @@
         background-color: gainsboro;
     }
 }
-.action_like {
-    animation: swipeRight 1s;
-    z-index: 10;
-}
-.action_dislike {
-    animation: swipeLeft 1s;
-    z-index: 10;
-}
-@keyframes swipeRight {
-    to {
-        transform: translateX(200px);
-    }
-}
-
-@keyframes swipeLeft {
-    to {
-        transform: translateX(-200px);
-    }
-}
