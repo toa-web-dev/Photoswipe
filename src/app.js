@@ -18,11 +18,11 @@ function app() {
         $btnDislike.classList.add("active");
         $btnLike.onclick = (e) => {
             const preference = e.target.dataset.btnPreference;
-            thorttle(() => Swipe(preference));
+            thorttle(() => swipe(preference));
         };
         $btnDislike.onclick = (e) => {
             const preference = e.target.dataset.btnPreference;
-            thorttle(() => Swipe(preference));
+            thorttle(() => swipe(preference));
         };
         const thorttle = (func) => {
             if (!throttleTimer) {
@@ -40,12 +40,14 @@ function app() {
             }
         };
     };
+    //카드 DOM요소를 추가하는 작업과 fetch한 배경이미지를 할당하는 작업이 분리 되어야 한다고 생각함
     const InitData = async () => {
         targetArr = await getCardDataFromId(cardIdArr); //[0,1,2,3,4]
         for (let i = targetArr.length - 1; i >= 0; i--) {
             $cardContainer.appendChild(Item(targetArr[i]));
         }
         $currentCard = $cardContainer.querySelector(".card:last-child");
+        initPointerEvent();
         cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
         bufferArr = await getCardDataFromId(cardIdArr);
     };
@@ -67,23 +69,89 @@ function app() {
     };
     const RemoveCard = (preference) => {
         try {
-            $currentCard.classList.add(`action_${preference}`);
+            let flyX, flyY;
+            let deg;
+            if (Object.keys(distance).length === 0) {
+                flyX = preference === "like" ? innerWidth : -innerWidth;
+                flyY = 0;
+                deg = 0;
+            } else {
+                const slope = distance.y / distance.x;
+                flyX = (Math.abs(distance.x) / distance.x) * innerWidth;
+                flyY = slope * flyX;
+                deg = (distance.x / innerWidth) * 100;
+            }
+
+            console.log(flyX, flyY);
+            console.log(preference);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
+
             const $prevCard = $currentCard;
             $currentCard = $currentCard.previousElementSibling;
+
             const RemoveSwipedCard = () => {
                 $cardContainer.removeChild($prevCard);
-                $prevCard.removeEventListener("animationend", RemoveSwipedCard);
+                $prevCard.removeEventListener("transitionend", RemoveSwipedCard);
             };
-            $prevCard.addEventListener("animationend", RemoveSwipedCard);
+            $prevCard.addEventListener("transitionend", RemoveSwipedCard);
+
+            startPoint = {};
+            distance = {};
         } catch (e) {
             console.log("카드 제거 중 오류 발생", e);
         }
     };
-    const Swipe = (preference) => {
-        const curCardId = parseInt($currentCard.id);
-        InsertCard(curCardId);
+
+    const swipe = (preference) => {
+        InsertCard();
         RemoveCard(preference);
+        initPointerEvent();
     };
+    const set$currentCardTransform = (x = 0, y = 0, deg = 0, duration = null) => {
+        $currentCard.style.transform = `translate(${x}px,${y}px) rotate(${deg}deg)`;
+        if (duration) {
+            $currentCard.style.transition = `transform ${duration}ms`;
+            setTimeout(() => {
+                $currentCard.style.transition = ``;
+            }, duration);
+        }
+    };
+    let startPoint = {},
+        distance = {};
+    const initPointerEvent = () => {
+        $currentCard.addEventListener("pointerdown", pointerDown);
+        $currentCard.removeEventListener("pointermove", pointerMove);
+        $currentCard.removeEventListener("pointerup", pointerUp);
+        $currentCard.removeEventListener("pointerleave", pointerLeave);
+    };
+    const pointerDown = (e) => {
+        startPoint = { x: parseInt(e.clientX), y: parseInt(e.clientY) };
+        $currentCard.addEventListener("pointermove", pointerMove);
+        $currentCard.addEventListener("pointerup", pointerUp);
+        $currentCard.addEventListener("pointerleave", pointerLeave);
+    };
+    const pointerMove = (e) => {
+        distance = {
+            x: parseInt(e.clientX) - startPoint.x,
+            y: parseInt(e.clientY) - startPoint.y,
+        };
+        const deg = (distance.x / innerWidth) * 100;
+        set$currentCardTransform(distance.x, distance.y, deg);
+    };
+    const pointerLeave = () => {
+        pointerUp();
+    };
+    const pointerUp = () => {
+        initPointerEvent();
+        if ($cardContainer.clientWidth / 2 < Math.abs(distance.x)) {
+            const preference = distance.x > 0 ? "like" : "dislike";
+            swipe(preference);
+        } else {
+            set$currentCardTransform(0, 0, 0, 100);
+        }
+    };
+
     InitBtn();
     InitData();
 }
