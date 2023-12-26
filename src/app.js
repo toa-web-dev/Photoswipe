@@ -18,11 +18,11 @@ function app() {
         $btnDislike.classList.add("active");
         $btnLike.onclick = (e) => {
             const preference = e.target.dataset.btnPreference;
-            thorttle(() => Swipe(preference));
+            thorttle(() => swipe(preference));
         };
         $btnDislike.onclick = (e) => {
             const preference = e.target.dataset.btnPreference;
-            thorttle(() => Swipe(preference));
+            thorttle(() => swipe(preference));
         };
         const thorttle = (func) => {
             if (!throttleTimer) {
@@ -37,7 +37,6 @@ function app() {
             }
         };
     };
-
     //카드 DOM요소를 추가하는 작업과 fetch한 배경이미지를 할당하는 작업이 분리 되어야 한다고 생각함
     const InitData = async () => {
         targetArr = await getCardDataFromId(cardIdArr); //[0,1,2,3,4]
@@ -65,83 +64,89 @@ function app() {
     };
     const RemoveCard = (preference) => {
         try {
-            // 아래 트랜스폼 값을 화면 밖으로 날아가게 바꾸면 됨
-            set$currentCardTransform(0, 0, 10, 0.5);
+            let flyX, flyY;
+            let deg;
+            if (Object.keys(distance).length === 0) {
+                flyX = preference === "like" ? innerWidth : -innerWidth;
+                flyY = 0;
+                deg = 0;
+            } else {
+                const slope = distance.y / distance.x;
+                flyX = (Math.abs(distance.x) / distance.x) * innerWidth;
+                flyY = slope * flyX;
+                deg = (distance.x / innerWidth) * 100;
+            }
+
+            console.log(flyX, flyY);
+            console.log(preference);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
+
             const $prevCard = $currentCard;
             $currentCard = $currentCard.previousElementSibling;
+
             const RemoveSwipedCard = () => {
                 $cardContainer.removeChild($prevCard);
                 $prevCard.removeEventListener("transitionend", RemoveSwipedCard);
             };
             $prevCard.addEventListener("transitionend", RemoveSwipedCard);
+
+            startPoint = {};
+            distance = {};
         } catch (e) {
             console.log("카드 제거 중 오류 발생", e);
         }
     };
-    const Swipe = (preference) => {
+    const swipe = (preference) => {
         InsertCard();
         RemoveCard(preference);
         initPointerEvent();
     };
-    InitBtn();
-    InitData();
-
     const set$currentCardTransform = (x = 0, y = 0, deg = 0, duration = null) => {
         $currentCard.style.transform = `translate(${x}px,${y}px) rotate(${deg}deg)`;
-        if (duration) $currentCard.style.transition = `transform ${duration}s`;
+        if (duration) {
+            $currentCard.style.transition = `transform ${duration}ms`;
+            setTimeout(() => {
+                $currentCard.style.transition = ``;
+            }, duration);
+        }
     };
-
     let startPoint = {},
-        movePoint = {},
         distance = {};
     const initPointerEvent = () => {
-        console.log("init pointer event");
         $currentCard.addEventListener("pointerdown", pointerDown);
         $currentCard.removeEventListener("pointermove", pointerMove);
         $currentCard.removeEventListener("pointerup", pointerUp);
         $currentCard.removeEventListener("pointerleave", pointerLeave);
     };
-
     const pointerDown = (e) => {
-        console.log("pointer down");
         startPoint = { x: parseInt(e.clientX), y: parseInt(e.clientY) };
         $currentCard.addEventListener("pointermove", pointerMove);
         $currentCard.addEventListener("pointerup", pointerUp);
         $currentCard.addEventListener("pointerleave", pointerLeave);
     };
-
     const pointerMove = (e) => {
-        console.log("pointer move");
-        movePoint = { x: parseInt(e.clientX), y: parseInt(e.clientY) };
         distance = {
-            x: movePoint.x - startPoint.x,
-            y: movePoint.y - startPoint.y,
+            x: parseInt(e.clientX) - startPoint.x,
+            y: parseInt(e.clientY) - startPoint.y,
         };
-        //일차방정식의 기울기 slope
-        // const slope = distance.y / distance.x ? distance.y / distance.x : 0;
-        // console.log(`기울기는 ${distance.y} / ${distance.x}`, distance.y / distance.x);
-        // console.log(`절편은 ${startPoint.y} - ${slope} * ${startPoint.x}`, startPoint.y - slope * startPoint.x);
-        const rotateDeg = (distance.x / window.innerWidth) * 30;
-        set$currentCardTransform(distance.x, distance.y, rotateDeg);
+        const deg = (distance.x / innerWidth) * 100;
+        set$currentCardTransform(distance.x, distance.y, deg);
     };
     const pointerLeave = () => {
-        console.log("pointer leave");
-        initPointerEvent();
-        // 스와이프 범위 미만에서 발동될 경우 원점으로 돌아감
-        set$currentCardTransform(0, 0);
-        // 스와이프 범위 이상일 경우 OX 처리 함수 실행
+        pointerUp();
     };
     const pointerUp = () => {
-        console.log("pointer up");
         initPointerEvent();
         if ($cardContainer.clientWidth / 2 < Math.abs(distance.x)) {
             const preference = distance.x > 0 ? "like" : "dislike";
-            Swipe(preference);
-        } else set$currentCardTransform(0, 0);
-
-        // 스와이프 범위 미만에서 발동될 경우 원점으로 돌아감
-
-        // 스와이프 범위 이상일 경우 OX 처리 함수 실행
+            swipe(preference);
+        } else {
+            set$currentCardTransform(0, 0, 0, 100);
+        }
     };
+
+    InitBtn();
+    InitData();
 }
 app();
