@@ -53,6 +53,7 @@ function app() {
     };
     const InsertCard = async (curCardId) => {
         try {
+            const curCardId = parseInt($currentCard.id);
             const renderItem = bufferArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0];
             $cardContainer.insertBefore(Item(renderItem), $cardContainer.firstElementChild);
             if (curCardId === targetArr.at(-1).id) {
@@ -67,6 +68,7 @@ function app() {
             }, 500);
         }
     };
+
     const RemoveCard = (preference) => {
         try {
             let flyX, flyY;
