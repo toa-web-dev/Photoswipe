@@ -1,10 +1,9 @@
-export function Item(_data) {
+export function Item(_id) {
     const $figure = document.createElement("figure");
-    $figure.id = _data.id;
+    $figure.id = _id;
     $figure.classList.add("card");
-    $figure.style.backgroundImage = `url(${_data.url})`;
     const $figcap = document.createElement("figcaption");
-    $figcap.textContent = _data.id;
+    $figcap.textContent = _id;
     $figure.appendChild($figcap);
 
     return $figure;

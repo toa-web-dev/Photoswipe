@@ -1,14 +1,12 @@
-import { getCardDataFromId } from "./util/fetch.js";
+// import { getCardDataFromId } from "./util/fetch.js";
 import { Item } from "./components/Item.js";
-
+const URL = import.meta.env.VITE_URL;
 const RENDER_CARD_NUM = 5;
 
 function app() {
     let $cardContainer = document.querySelector("#card_container");
     let $currentCard;
-    let cardIdArr = Array.from({ length: RENDER_CARD_NUM }).map((_, index) => index);
-    let targetArr = [];
-    let bufferArr = [];
+    let cardId = 0;
 
     const InitBtn = () => {
         let throttleTimer = null;
@@ -36,35 +34,31 @@ function app() {
                     throttleTimer = null;
                     $btnLike.classList.replace("deactive", "active");
                     $btnDislike.classList.replace("deactive", "active");
-                }, 1000);
+                }, 500);
             }
         };
     };
-    //카드 DOM요소를 추가하는 작업과 fetch한 배경이미지를 할당하는 작업이 분리 되어야 한다고 생각함
-    const InitData = async () => {
-        targetArr = await getCardDataFromId(cardIdArr); //[0,1,2,3,4]
-        for (let i = targetArr.length - 1; i >= 0; i--) {
-            $cardContainer.appendChild(Item(targetArr[i]));
-        }
-        $currentCard = $cardContainer.querySelector(".card:last-child");
-        initPointerEvent();
-        cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
-        bufferArr = await getCardDataFromId(cardIdArr);
+
+    const createNewCard = () => {
+        const $item = Item(cardId);
+        $item.style.backgroundImage = `url("${URL}?random=${cardId}")`;
+        cardId++;
+        return $item;
     };
-    const InsertCard = async (curCardId) => {
+
+    const InitCard = () => {
+        for (let i = 0; i <= RENDER_CARD_NUM; i++) {
+            $cardContainer.insertBefore(createNewCard(), $cardContainer.firstElementChild);
+        }
+        $currentCard = $cardContainer.lastElementChild;
+    };
+    const InsertCard = () => {
         try {
-            const curCardId = parseInt($currentCard.id);
-            const renderItem = bufferArr.filter((el) => el.id === curCardId + RENDER_CARD_NUM)[0];
-            $cardContainer.insertBefore(Item(renderItem), $cardContainer.firstElementChild);
-            if (curCardId === targetArr.at(-1).id) {
-                targetArr = bufferArr;
-                cardIdArr = cardIdArr.map((el) => el + RENDER_CARD_NUM);
-                bufferArr = await getCardDataFromId(cardIdArr);
-            }
+            $cardContainer.insertBefore(createNewCard(), $cardContainer.firstElementChild);
         } catch (e) {
             console.log("카드 추가 실패, 카드 추가 재시도...", e);
             setTimeout(() => {
-                InsertCard(curCardId);
+                InsertCard();
             }, 500);
         }
     };
@@ -74,35 +68,30 @@ function app() {
             let flyX, flyY;
             let deg;
             if (Object.keys(distance).length === 0) {
-                flyX = preference === "like" ? innerWidth : -innerWidth;
-                flyY = 0;
-                deg = 0;
+                const direction = preference === "like" ? 1 : -1;
+                flyX = direction * innerWidth;
+                flyY = Math.random() * 1200 - 600;
+                deg = direction * 30;
             } else {
                 const slope = distance.y / distance.x;
                 flyX = (Math.abs(distance.x) / distance.x) * innerWidth;
                 flyY = slope * flyX;
                 deg = (distance.x / innerWidth) * 100;
             }
-
-            console.log(flyX, flyY);
-            console.log(preference);
-            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
             set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
 
             const $prevCard = $currentCard;
             $currentCard = $currentCard.previousElementSibling;
-
             const RemoveSwipedCard = () => {
                 $cardContainer.removeChild($prevCard);
                 $prevCard.removeEventListener("transitionend", RemoveSwipedCard);
             };
             $prevCard.addEventListener("transitionend", RemoveSwipedCard);
-
-            startPoint = {};
-            distance = {};
         } catch (e) {
             console.log("카드 제거 중 오류 발생", e);
         }
+        startPoint = {};
+        distance = {};
     };
 
     const swipe = (preference) => {
@@ -110,6 +99,8 @@ function app() {
         RemoveCard(preference);
         initPointerEvent();
     };
+
+    // 카드 인터랙션 코드
     const set$currentCardTransform = (x = 0, y = 0, deg = 0, duration = null) => {
         $currentCard.style.transform = `translate(${x}px,${y}px) rotate(${deg}deg)`;
         if (duration) {
@@ -155,6 +146,7 @@ function app() {
     };
 
     InitBtn();
-    InitData();
+    InitCard();
+    initPointerEvent();
 }
 app();
