@@ -1,7 +1,7 @@
-// import { getCardDataFromId } from "./util/fetch.js";
 import { Item } from "./components/Item.js";
 const URL = import.meta.env.VITE_URL;
 const RENDER_CARD_NUM = 5;
+const THROTTLE_MS = 200;
 
 function app() {
     let $cardContainer = document.querySelector("#card_container");
@@ -34,7 +34,7 @@ function app() {
                     throttleTimer = null;
                     $btnLike.classList.replace("deactive", "active");
                     $btnDislike.classList.replace("deactive", "active");
-                }, 500);
+                }, THROTTLE_MS);
             }
         };
     };
@@ -78,7 +78,7 @@ function app() {
                 flyY = slope * flyX;
                 deg = (distance.x / innerWidth) * 100;
             }
-            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.5);
 
             const $prevCard = $currentCard;
             $currentCard = $currentCard.previousElementSibling;
