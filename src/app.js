@@ -47,7 +47,7 @@ function app() {
     };
 
     const InitCard = () => {
-        for (let i = 0; i <= RENDER_CARD_NUM; i++) {
+        for (let i = 0; i < RENDER_CARD_NUM; i++) {
             $cardContainer.insertBefore(createNewCard(), $cardContainer.firstElementChild);
         }
         $currentCard = $cardContainer.lastElementChild;
