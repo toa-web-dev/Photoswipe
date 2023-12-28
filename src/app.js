@@ -1,12 +1,13 @@
-// import { getCardDataFromId } from "./util/fetch.js";
 import { Item } from "./components/Item.js";
 const URL = import.meta.env.VITE_URL;
 const RENDER_CARD_NUM = 5;
 
 function app() {
-    let $cardContainer = document.querySelector("#card_container");
-    let $currentCard;
-    let cardId = 0;
+    let $cardContainer = document.querySelector("#card_container"); // RENDER_CARD_NUM의 수 만큼의 카드를 보관
+    let $currentCard;    // $cardContainer에서 사용자가 조작하는 맨 앞에 위치한 카드
+    let cardId = 0;      // 이미지를 요청하는 외부 API에서 사용되는 id값
+    let startPoint = {}, // 카드의 움직임에 사용되는 좌표 x와 y값이 할당되는 변수
+        distance = {};
 
     const InitBtn = () => {
         let throttleTimer = null;
@@ -14,22 +15,29 @@ function app() {
         const $btnDislike = document.querySelector('[data-btn-preference="dislike"]');
         $btnLike.classList.add("active");
         $btnDislike.classList.add("active");
+
         $btnLike.onclick = (e) => {
-            const preference = e.target.dataset.btnPreference;
-            thorttle(() => swipe(preference));
+            btnHandler(e);
         };
         $btnDislike.onclick = (e) => {
-            const preference = e.target.dataset.btnPreference;
-            thorttle(() => swipe(preference));
+            btnHandler(e);
         };
-        const thorttle = (func) => {
+
+        const btnHandler = (e) => {
+            const preference = e.target.dataset.btnPreference;
+            const $figcap = $currentCard.querySelector("figcaption");
+            btnThorttle(() => {
+                $figcap.classList.add(preference);
+                $figcap.style.opacity = 1;
+                swipe(preference);
+            });
+        };
+
+        const btnThorttle = (func) => {
             if (!throttleTimer) {
                 func();
                 $btnLike.classList.replace("active", "deactive");
                 $btnDislike.classList.replace("active", "deactive");
-
-                //시간이 지나서 버튼이 활성화되는 것이아니라
-                // currentCard의 다음 카드(previousSibling)이 이미지 렌더가 완료 되었을때 활성화하기
                 throttleTimer = setTimeout(() => {
                     throttleTimer = null;
                     $btnLike.classList.replace("deactive", "active");
@@ -52,6 +60,7 @@ function app() {
         }
         $currentCard = $cardContainer.lastElementChild;
     };
+
     const InsertCard = () => {
         try {
             $cardContainer.insertBefore(createNewCard(), $cardContainer.firstElementChild);
@@ -67,19 +76,22 @@ function app() {
         try {
             let flyX, flyY;
             let deg;
+
+            // 버튼을 눌러서 포인터 이벤트에서 할당되는 distance의 값이 없는 경우
             if (Object.keys(distance).length === 0) {
                 const direction = preference === "like" ? 1 : -1;
                 flyX = direction * innerWidth;
-                flyY = Math.random() * 1200 - 600;
+                flyY = 0;
                 deg = direction * 30;
             } else {
                 const slope = distance.y / distance.x;
                 flyX = (Math.abs(distance.x) / distance.x) * innerWidth;
                 flyY = slope * flyX;
-                deg = (distance.x / innerWidth) * 100;
+                deg = (distance.x / innerWidth) * 30;
             }
             set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
 
+            // 다음 카드를 $currentCard에 할당
             const $prevCard = $currentCard;
             $currentCard = $currentCard.previousElementSibling;
             const RemoveSwipedCard = () => {
@@ -90,6 +102,7 @@ function app() {
         } catch (e) {
             console.log("카드 제거 중 오류 발생", e);
         }
+
         startPoint = {};
         distance = {};
     };
@@ -100,7 +113,6 @@ function app() {
         initPointerEvent();
     };
 
-    // 카드 인터랙션 코드
     const set$currentCardTransform = (x = 0, y = 0, deg = 0, duration = null) => {
         $currentCard.style.transform = `translate(${x}px,${y}px) rotate(${deg}deg)`;
         if (duration) {
@@ -110,8 +122,8 @@ function app() {
             }, duration);
         }
     };
-    let startPoint = {},
-        distance = {};
+
+    // ===포인터 이벤트 관련 코드 시작===
     const initPointerEvent = () => {
         $currentCard.addEventListener("pointerdown", pointerDown);
         $currentCard.removeEventListener("pointermove", pointerMove);
@@ -129,8 +141,18 @@ function app() {
             x: parseInt(e.clientX) - startPoint.x,
             y: parseInt(e.clientY) - startPoint.y,
         };
-        const deg = (distance.x / innerWidth) * 100;
-        set$currentCardTransform(distance.x, distance.y, deg);
+        const $figcap = $currentCard.querySelector("figcaption");
+        if (distance.x !== 0) {
+            if (distance.x > 0) {
+                $figcap.className = "like";
+            } else {
+                $figcap.className = "dislike";
+            }
+            $figcap.style.opacity = (Math.abs(distance.x) / ($currentCard.offsetWidth / 2)) * 1.1;
+        } else {
+            $currentCard.querySelector("figcaption").className = "";
+        }
+        set$currentCardTransform(distance.x, distance.y, (distance.x / innerWidth) * 100);
     };
     const pointerLeave = () => {
         pointerUp();
@@ -141,9 +163,11 @@ function app() {
             const preference = distance.x > 0 ? "like" : "dislike";
             swipe(preference);
         } else {
+            $currentCard.querySelector("figcaption").className = "";
             set$currentCardTransform(0, 0, 0, 100);
         }
     };
+    // ===포인터 이벤트 관련 코드 끝===
 
     InitBtn();
     InitCard();
