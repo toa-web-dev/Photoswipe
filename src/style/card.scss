@@ -1,22 +1,63 @@
+:root {
+  --dislike--color: #ff1e00;
+  --like--color: #44C662;
+}
+
 #card_container {
-    position: relative;
-    width: 300px;
-    height: 400px;
+  position: relative;
+  width: 300px;
+  height: 400px;
 }
 
 .card {
-    position: absolute;
-    width: inherit;
-    height: inherit;
-    background-color: snow;
-    border: 2px solid black;
-    border-radius: 0.6rem;
-    cursor: pointer;
-    user-select: none;
-    touch-action: none;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  width: inherit;
+  height: inherit;
+  background-color: snow;
+  cursor: pointer;
+  border-radius: 0.6rem;
     figcaption {
-        text-align: center;
-        font-size: 2rem;
-        background-color: gainsboro;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      width: 14rem;
+      height: 4rem;
+      border-width: 4px;
+      border-style: solid;
+      border-color: transparent;
+      border-radius: 10px;
+      font-size: 4rem;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        &.like {
+            &::after {
+              content: "YEAH";
+            }
+            border-color: var(--like--color);
+            color: var(--like--color);
+        }
+        &.dislike {
+            &::after {
+              content: "NOPE";
+            }
+            border-color: var(--dislike--color);
+            color: var(--dislike--color);
+        }
+    }
+}
+
+@keyframes addCard {
+    0% {
+        opacity: 0;
+        left: 3rem;
+    }
+    100% {
+      left: 1.5rem;
+      opacity: 1;
     }
 }
