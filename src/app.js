@@ -5,8 +5,8 @@ const THROTTLE_MS = 200;
 
 function app() {
     let $cardContainer = document.querySelector("#card_container"); // RENDER_CARD_NUM의 수 만큼의 카드를 보관
-    let $currentCard;    // $cardContainer에서 사용자가 조작하는 맨 앞에 위치한 카드
-    let cardId = 0;      // 이미지를 요청하는 외부 API에서 사용되는 id값
+    let $currentCard; // $cardContainer에서 사용자가 조작하는 맨 앞에 위치한 카드
+    let cardId = 0; // 이미지를 요청하는 외부 API에서 사용되는 id값
     let startPoint = {}, // 카드의 움직임에 사용되는 좌표 x와 y값이 할당되는 변수
         distance = {};
 
@@ -88,9 +88,9 @@ function app() {
                 const slope = distance.y / distance.x;
                 flyX = (Math.abs(distance.x) / distance.x) * innerWidth;
                 flyY = slope * flyX;
-                deg = (distance.x / innerWidth) * 30;
+                deg = (distance.x / innerWidth) * 100;
             }
-            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.5);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 1.1);
 
             // 다음 카드를 $currentCard에 할당
             const $prevCard = $currentCard;
@@ -151,7 +151,7 @@ function app() {
             }
             $figcap.style.opacity = (Math.abs(distance.x) / ($currentCard.offsetWidth / 2)) * 1.1;
         } else {
-            $currentCard.querySelector("figcaption").className = "";
+            $figcap.className = "";
         }
         set$currentCardTransform(distance.x, distance.y, (distance.x / innerWidth) * 100);
     };
