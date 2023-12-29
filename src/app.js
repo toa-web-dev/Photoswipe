@@ -75,49 +75,49 @@ function app() {
 
     const RemoveCard = (preference) => {
         try {
+            console.log("removecard", preference);
             let flyX, flyY;
             let deg;
-
-            // 버튼을 눌러서 포인터 이벤트에서 할당되는 distance의 값이 없는 경우
+            const direction = preference === "like" ? 1 : -1;
             if (Object.keys(distance).length === 0) {
-                const direction = preference === "like" ? 1 : -1;
-                flyX = direction * innerWidth;
+                // 버튼을 눌러서 포인터 이벤트에서 할당되는 distance의 값이 없는 경우
+                flyX = direction * (innerWidth / 2 + $currentCard.offsetWidth);
                 flyY = 0;
                 deg = direction * 30;
             } else {
                 const slope = distance.y / distance.x;
-                flyX = (Math.abs(distance.x) / distance.x) * innerWidth;
+                flyX = (Math.abs(distance.x) / distance.x) * (innerWidth / 2 + $currentCard.offsetWidth);
                 flyY = slope * flyX;
                 deg = (distance.x / innerWidth) * 100;
             }
-            set$currentCardTransform(flyX, flyY, deg, innerWidth * 1.2);
-
-            // 다음 카드를 $currentCard에 할당
-            const $prevCard = $currentCard;
-            $currentCard = $currentCard.previousElementSibling;
-            const RemoveSwipedCard = () => {
-                $cardContainer.removeChild($prevCard);
-                $prevCard.removeEventListener("transitionend", RemoveSwipedCard);
-            };
-            $prevCard.addEventListener("transitionend", RemoveSwipedCard);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
         } catch (e) {
             console.log("카드 제거 중 오류 발생", e);
         }
-
-        startPoint = {};
-        distance = {};
     };
 
     const swipe = (preference) => {
         InsertCard();
         RemoveCard(preference);
+
+        // 다음 카드를 $currentCard에 할당
+        const $prevCard = $currentCard;
+        $currentCard = $currentCard.previousElementSibling;
+        const RemoveSwipedCard = () => {
+            $cardContainer.removeChild($prevCard);
+            $prevCard.removeEventListener("transitionend", RemoveSwipedCard);
+        };
+        $prevCard.addEventListener("transitionend", RemoveSwipedCard);
+        startPoint = {};
+        distance = {};
+
         initPointerEvent();
     };
 
     const set$currentCardTransform = (x = 0, y = 0, deg = 0, duration = null) => {
         $currentCard.style.transform = `translate(${x}px,${y}px) rotate(${deg}deg)`;
         if (duration) {
-            $currentCard.style.transition = `transform ${duration}ms`;
+            $currentCard.style.transition = `transform ${duration}ms ease-in`;
             setTimeout(() => {
                 $currentCard.style.transition = ``;
             }, duration);
