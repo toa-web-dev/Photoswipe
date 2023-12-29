@@ -90,7 +90,7 @@ function app() {
                 flyY = slope * flyX;
                 deg = (distance.x / innerWidth) * 100;
             }
-            set$currentCardTransform(flyX, flyY, deg, innerWidth * 1.1);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 1.2);
 
             // 다음 카드를 $currentCard에 할당
             const $prevCard = $currentCard;
@@ -149,7 +149,7 @@ function app() {
             } else {
                 $figcap.className = "dislike";
             }
-            $figcap.style.opacity = (Math.abs(distance.x) / ($currentCard.offsetWidth / 2)) * 1.1;
+            $figcap.style.opacity = (Math.abs(distance.x) / ($currentCard.offsetWidth / 2)) * 0.4;
         } else {
             $figcap.className = "";
         }
