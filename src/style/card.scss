@@ -1,0 +1,68 @@
+:root {
+    --dislike--color: #fb4f68;
+    --like--color: #4dca93;
+}
+
+#card_container {
+    position: relative;
+    width: 300px;
+    height: 400px;
+}
+
+.card {
+    user-select: none;
+    touch-action: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    background-color: snow;
+    cursor: pointer;
+    border-radius: 0.6rem;
+    figcaption {
+        filter: contrast(3);
+        rotate: 8deg;
+        // box-shadow: 1px 5px 1px rgba(102, 102, 102, 0.1);
+        text-shadow: 0px 0px 6px rgb(0, 0, 0);
+        position: absolute;
+        top: 70%;
+        left: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        padding: 0 2rem;
+        border-width: 3px;
+        border-style: solid;
+        border-color: transparent;
+        border-radius: 5%;
+        font-size: 3rem;
+        font-family: Patrick Hand;
+        line-height: 125%;
+        text-align: center;
+        letter-spacing: 0.5rem;
+        &.like {
+            &::after {
+                content: "YEAH";
+            }
+            border-color: var(--like--color);
+            color: var(--like--color);
+        }
+        &.dislike {
+            &::after {
+                content: "NOPE";
+            }
+            border-color: var(--dislike--color);
+            color: var(--dislike--color);
+        }
+    }
+}
+
+@keyframes addCard {
+    0% {
+        opacity: 0;
+        left: 3rem;
+    }
+    100% {
+        left: 1.5rem;
+        opacity: 1;
+    }
+}

@@ -1,0 +1,25 @@
+#button_container {
+  margin-top: 1rem;
+    button {
+      background-color: transparent;
+      border: none;
+      font-size: 2rem;
+    }
+}
+
+.active {
+  opacity: 1;
+  cursor: pointer;
+    &[data-btn-preference="like"] {
+      color: green;
+    }
+    &[data-btn-preference="dislike"] {
+      color: red;
+    }
+}
+
+.deactive {
+  opacity: 0.5;
+  background-color: gray;
+  color: white;
+}
