@@ -75,7 +75,6 @@ function app() {
 
     const RemoveCard = (preference) => {
         try {
-            console.log("removecard", preference);
             let flyX, flyY;
             let deg;
             const direction = preference === "like" ? 1 : -1;
@@ -90,7 +89,7 @@ function app() {
                 flyY = slope * flyX;
                 deg = (distance.x / innerWidth) * 100;
             }
-            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.7);
+            set$currentCardTransform(flyX, flyY, deg, innerWidth * 0.5);
         } catch (e) {
             console.log("카드 제거 중 오류 발생", e);
         }
