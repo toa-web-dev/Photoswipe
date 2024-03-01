@@ -3,5 +3,9 @@
 
 > `[알림❗]` 이 저장소의 내용은 학습을 위해 [자바스크립트로 소개팅앱 스타일 카드 스와이프 마스터하기](https://www.youtube.com/watch?v=O0rgN2H9pEY)을 참고하고 기능을 추가한 프로젝트입니다.
 
+## 추가한 기능
+- 정적인 JSON 데이터대신 [Lorem Picsum](https://picsum.photos/)의 이미지를 사용하여 다양한 사진을 볼 수 있습니다.
+- 
+
 ## ✔️ 배운 점
-- 카드를 스와이프 할 때 발생하는 이벤트 처리에 [pointer이벤트](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events)를 사용하여 pc와 모바일 웹에서 mouse와 touch 입력이 모두 가능하다
+- 카드를 스와이프 할 때 발생하는 이벤트 처리에 [pointer이벤트](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events)를 사용하여 pc와 모바일 웹에서 mouse와 touch 입력이 모두 가능함을 알았습니다.
