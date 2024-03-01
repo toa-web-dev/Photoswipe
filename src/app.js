@@ -1,50 +1,45 @@
 import { Item } from "./components/Item.js";
 const URL = import.meta.env.VITE_URL;
 const RENDER_CARD_NUM = 5;
-const THROTTLE_MS = 200;
+const THROTTLE_DELAY_MS = 200;
 
 function app() {
     let $cardContainer = document.querySelector("#card_container"); // RENDER_CARD_NUM의 수 만큼의 카드를 보관
     let $currentCard; // $cardContainer에서 사용자가 조작하는 맨 앞에 위치한 카드
+    let $figcap; //사진 카드 위에 표시되는 호불호를 표시하는 텍스트를 담는 부모 요소
     let cardId = 0; // 이미지를 요청하는 외부 API에서 사용되는 id값
     let startPoint = {}, // 카드의 움직임에 사용되는 좌표 x와 y값이 할당되는 변수
         distance = {};
 
     const InitBtn = () => {
-        let throttleTimer = null;
+        let throttlingTimerID = null;
         const $btnLike = document.querySelector('[data-btn-preference="like"]');
         const $btnDislike = document.querySelector('[data-btn-preference="dislike"]');
         $btnLike.classList.add("active");
         $btnDislike.classList.add("active");
 
-        $btnLike.onclick = (e) => {
-            btnHandler(e);
-        };
-        $btnDislike.onclick = (e) => {
-            btnHandler(e);
-        };
-
         const btnHandler = (e) => {
+            $figcap = $currentCard.querySelector("figcaption");
             const preference = e.target.dataset.btnPreference;
-            const $figcap = $currentCard.querySelector("figcaption");
-            btnThorttle(() => {
+            if (!throttlingTimerID) {
                 $figcap.classList.add(preference);
                 $figcap.style.opacity = 1;
                 swipe(preference);
-            });
+                btnThorttle();
+            }
         };
 
-        const btnThorttle = (func) => {
-            if (!throttleTimer) {
-                func();
-                $btnLike.classList.replace("active", "deactive");
-                $btnDislike.classList.replace("active", "deactive");
-                throttleTimer = setTimeout(() => {
-                    throttleTimer = null;
-                    $btnLike.classList.replace("deactive", "active");
-                    $btnDislike.classList.replace("deactive", "active");
-                }, THROTTLE_MS);
-            }
+        $btnLike.onclick = btnHandler;
+        $btnDislike.onclick = btnHandler;
+
+        const btnThorttle = () => {
+            $btnLike.classList.replace("active", "deactive");
+            $btnDislike.classList.replace("active", "deactive");
+            throttlingTimerID = setTimeout(() => {
+                throttlingTimerID = null;
+                $btnLike.classList.replace("deactive", "active");
+                $btnDislike.classList.replace("deactive", "active");
+            }, THROTTLE_DELAY_MS);
         };
     };
 
